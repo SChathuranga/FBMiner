@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" ignored="0" total="1" passed="1">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Default suite" duration-ms="39450" started-at="2018-07-07T19:03:54Z" finished-at="2018-07-07T19:04:33Z">
+    <groups>
+    </groups>
+    <test name="Default test" duration-ms="39450" started-at="2018-07-07T19:03:54Z" finished-at="2018-07-07T19:04:33Z">
+      <class name="com.genesislab.seleniumbase.CoreBase">
+        <test-method status="PASS" signature="Facebook_Login()[pri:0, instance:com.genesislab.seleniumbase.CoreBase@6895a785]" name="Facebook_Login" duration-ms="39425" started-at="2018-07-07T19:03:54Z" finished-at="2018-07-07T19:04:33Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- Facebook_Login -->
+      </class> <!-- com.genesislab.seleniumbase.CoreBase -->
+    </test> <!-- Default test -->
+  </suite> <!-- Default suite -->
+</testng-results>
