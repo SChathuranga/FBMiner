@@ -1,6 +1,7 @@
 package com.genesislab.seleniumbase;
 
 import java.net.URL;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -17,19 +18,22 @@ public class CoreBase {
 	@SuppressWarnings("unused")
 	private static URL chromeDriverUrl = CoreBase.class.getResource("/chromedriver.exe");
 	User fbUser = new User();
-
-	public User Facebook_Login(String fbid, String accountUsername, String accountPassword) throws InterruptedException 
+	DBOperations dbop = new DBOperations();
+	
+	public User Facebook_Login(String fbid, String accountUsername, String accountPassword, Connection con) throws InterruptedException 
 	{
 		//Set FaceBook User name
 		fbUser.setFbid(fbid);
 		System.out.println("FB ID: " + fbid);
 		
 		ChromeOptions options = new ChromeOptions();
+		options.addArguments("--no-sandbox");
 		options.addArguments("--disable-notifications");
 		options.addArguments("headless");
-		System.setProperty("webdriver.chrome.driver", "/home/schathuranga/Softwares/GoogleChromeDriver/Linux/chromedriver"); // "E:/GenesisLab/GoogleChromeDriver/chromedriver.exe" "C:/chromedriver.exe"
+		System.setProperty("webdriver.chrome.driver", "C:/GoogleChromeDriver/chromedriver.exe"); // "E:/GenesisLab/GoogleChromeDriver/chromedriver.exe" "C:/chromedriver.exe"
 		///media/schathuranga/My Stuff/GenesisLab/GoogleChromeDriver
 		// GoogleChrome Driver
+		///home/schathuranga/Softwares/GoogleChromeDriver/Linux/chromedriver
 		WebDriver unitDriver = new ChromeDriver(options);
 		
 		String userid = "https://www.facebook.com/"+ fbid; //"s.chathuranga.jayaz"; //100003585110606
@@ -55,15 +59,25 @@ public class CoreBase {
 
 		ArrayList<String> tabs2 = new ArrayList<String>(unitDriver.getWindowHandles());
 		unitDriver.switchTo().window(tabs2.get(1));
-
-		WebElement element = unitDriver.findElement(By.xpath("//a[text()='About']"));
-		JavascriptExecutor executor = (JavascriptExecutor) unitDriver;
-		executor.executeScript("arguments[0].click();", element);
-
-		//fetch and set user's name
-		String username =unitDriver.findElement(By.xpath("//span[@id='fb-timeline-cover-name']/a")).getText();
-		System.out.println("Name: " + username);
-		fbUser.setName(username);
+		
+		try
+		{
+			WebElement element = unitDriver.findElement(By.xpath("//a[text()='About']"));
+			JavascriptExecutor executor = (JavascriptExecutor) unitDriver;
+			executor.executeScript("arguments[0].click();", element);
+	
+			//fetch and set user's name
+			String username =unitDriver.findElement(By.xpath("//span[@id='fb-timeline-cover-name']/a")).getText();
+			System.out.println("Name: " + username);
+			fbUser.setName(username);
+		}
+		catch(Exception exx)
+		{
+			System.out.println("Invalid Facebook ID or Connection problem!");
+			dbop.deleteCompleted(con, fbid);
+			exx.printStackTrace();
+			unitDriver.close();
+		}
 		
 		//fetch date of birth if displayed and save
 		/*WebElement dobElement = unitDriver.findElement(By.xpath("//ul[@class='uiList _4kg']/li/div/div/div/div[2]"));

@@ -35,7 +35,7 @@ public class FetchAtOnce implements Runnable
 		CoreBase fetch = new CoreBase();
 		try 
 		{
-			User facebookUser = fetch.Facebook_Login(facebookID, facebookUsername, facebookPassword);
+			User facebookUser = fetch.Facebook_Login(facebookID, facebookUsername, facebookPassword, connection);
 			if(dbops.insertUserData(connection, facebookUser))
 			{
 				System.out.println("\n"+facebookID + ": Fetching and Saving Data Successfull");

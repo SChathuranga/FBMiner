@@ -19,7 +19,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.genesislab.seleniumbase.CoreBase;
 import com.genesislab.seleniumbase.DBConnector;
 import com.genesislab.seleniumbase.DBOperations;
-import com.genesislab.seleniumbase.FetchAll;
 import com.genesislab.seleniumbase.FetchAtOnce;
 import com.genesislab.seleniumbase.User;
 
@@ -27,7 +26,6 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import java.awt.Color;
 
-import javax.print.DocFlavor.STRING;
 import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 import java.awt.event.ActionListener;
@@ -352,7 +350,6 @@ public class SeekerUI extends JFrame {
 		btnFetch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//write validation here
-				@SuppressWarnings("unused")
 				int count=0;
 				int dbCount = dbops.validateNumberOfRecords(connection);
 				if(txtIDsToFetch.getText().equals(""))
@@ -446,7 +443,7 @@ public class SeekerUI extends JFrame {
 					{
 						String facebookUsername = dbops.getAccountUserName(connection);
 						String facebookPassword = dbops.getAccountPassword(connection);
-						User entity = executeTest.Facebook_Login(txtFBID.getText(), facebookUsername, facebookPassword);
+						User entity = executeTest.Facebook_Login(txtFBID.getText(), facebookUsername, facebookPassword, connection);
 						if(dbops.insertUserData(connection, entity))
 							JOptionPane.showMessageDialog(null, "Data saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
 						else
