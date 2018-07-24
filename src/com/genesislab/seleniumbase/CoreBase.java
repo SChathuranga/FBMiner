@@ -74,6 +74,25 @@ public class CoreBase {
 		catch(Exception exx)
 		{
 			System.out.println("Invalid Facebook ID or Connection problem!");
+			//setting NA for fields
+			fbUser.setName("NA");
+			fbUser.setAbout("NA");
+			fbUser.setBasicInfo("NA");
+			fbUser.setContactInfo("NA");
+			fbUser.setCurrentCity("NA");
+			fbUser.setCurrentCity("NA");
+			fbUser.setEducation("NA");
+			fbUser.setFamily("NA");
+			fbUser.setFavoriteQuotes("NA");
+			fbUser.setFriends("NA");
+			fbUser.setGender("NA");
+			fbUser.setHomeTown("NA");
+			fbUser.setLifeEvents("NA");
+			fbUser.setOtherNames("NA");
+			fbUser.setRelationships("NA");
+			fbUser.setWorkplaces("NA");
+			
+			dbop.insertUserData(con, fbUser);
 			dbop.deleteCompleted(con, fbid);
 			exx.printStackTrace();
 			unitDriver.close();
