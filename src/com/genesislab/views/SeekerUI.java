@@ -419,73 +419,66 @@ public class SeekerUI extends JFrame {
 		
 		JButton btnFetchAll = new JButton("Fetch All");
 		btnFetchAll.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				//fetch till db has no ids
+			public void actionPerformed(ActionEvent e) 
+			{
+				//looping fetch
+				lblLoading.setVisible(true);
 				int count=0;
 				int dbCount = dbops.validateNumberOfRecords(connection);
 				int inputCount = Integer.parseInt(txtIDsToFetch.getText());
-				boolean condition = (dbCount!=0 && dbCount >= inputCount);
-				
-				while(condition)
-				{						
-					if(txtIDsToFetch.getText().equals(""))
-					{
-						System.out.println("Enter number of IDs to fetch please!");
-						JOptionPane.showMessageDialog(null, "Enter number of IDs to fetch please!", "Error", JOptionPane.ERROR_MESSAGE);
-					}
-					else
+				if(txtIDsToFetch.getText().equals(""))
+				{
+					System.out.println("Enter number of IDs to fetch please!");
+					JOptionPane.showMessageDialog(null, "Enter number of IDs to fetch at a time please!", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+				else if(inputCount > dbCount)
+				{
+					JOptionPane.showMessageDialog(null, "There are no that amount of IDs to be fetched!", "Error", JOptionPane.ERROR_MESSAGE);
+					System.out.println("There are no that amount of IDs to be fetched!");
+				}
+				else
+				{
+					String accountUsername = dbops.getAccountUserName(connection);
+					String accountPassword = dbops.getAccountPassword(connection);
+					String amount = (txtIDsToFetch.getText());
+					String lastID="";
+					//starts here
+					while(dbCount!=0 && dbCount>inputCount)
 					{
 						try
 						{
-							//int inputCount = Integer.parseInt(txtIDsToFetch.getText());
-							if(inputCount > dbCount)
+							ResultSet fbIDList = dbops.fetchIDs(connection, amount);
+							
+							while (fbIDList.next())
 							{
-								JOptionPane.showMessageDialog(null, "There are no that amount of IDs to be fetched! Fetching completed at the given sequence!", "Error", JOptionPane.ERROR_MESSAGE);
-								System.out.println("There are no that amount of IDs to be fetched!");
-								break;
-								//JOptionPane.showMessageDialog(null, "Fetching Completed", "Success", JOptionPane.INFORMATION_MESSAGE);
-							}
-							else
-							{
-								//start fetching from here onwards
-								String accountUsername = dbops.getAccountUserName(connection);
-								String accountPassword = dbops.getAccountPassword(connection);
-								String amount = (txtIDsToFetch.getText());
-								ResultSet fbIDList = dbops.fetchIDs(connection, amount);
-								String lastID="";
-								while (fbIDList.next())
+								String fbID = fbIDList.getString(1);	
+								FetchAtOnce fetch = new FetchAtOnce(fbID, accountUsername, accountPassword);
+								fetch.start();	
+								count++;
+								if(count==Integer.parseInt(amount))
 								{
-									String fbID = fbIDList.getString(1);	
-									FetchAtOnce fetch = new FetchAtOnce(fbID, accountUsername, accountPassword);
-									fetch.start();	
-									count++;
-									if(count==Integer.parseInt(amount))
-									{
-										lastID=fbID;
-									}
+									lastID=fbID;
 								}
-								
+							}
+							
+							TimeUnit.SECONDS.sleep(20);
+							while(dbops.checkIDAvailability(connection, lastID))
+							{
 								TimeUnit.SECONDS.sleep(20);
-								while(dbops.checkIDAvailability(connection, lastID))
-								{
-									TimeUnit.SECONDS.sleep(20);
-								}
-								//JOptionPane.showMessageDialog(null, "Fetching Completed", "Success", JOptionPane.INFORMATION_MESSAGE);
-								TimeUnit.SECONDS.sleep(3);
-								lblLoading.setVisible(false);
 							}
-	
+							System.out.println("########## Fetching one set COMPLETED! ############");
+							TimeUnit.SECONDS.sleep(3);
+							lblLoading.setVisible(false);
+							dbCount = dbops.validateNumberOfRecords(connection);
 						}
-						catch(Exception parsing)
+						catch(Exception exx)
 						{
-							parsing.printStackTrace();
+							exx.printStackTrace();
 						}
-						//JOptionPane.showMessageDialog(null, count + " Facebook user datas Fetched", "Operation Successful!", JOptionPane.INFORMATION_MESSAGE);
+						//ends here
 					}
-					dbCount = dbops.validateNumberOfRecords(connection);
-					condition = (dbCount!=0 && dbCount >= inputCount);
-				}
-				JOptionPane.showMessageDialog(null, "Fetching Completed", "Success", JOptionPane.INFORMATION_MESSAGE);
+					System.out.println("################## FETCHING ALL SETS COMPLETED SUCCESSFULLY! ############");
+				}	
 			}
 		});
 		btnFetchAll.setFont(new Font("Ubuntu", Font.PLAIN, 12));
