@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
+import javax.swing.JCheckBox;
 
 @SuppressWarnings("serial")
 public class SeekerUI extends JFrame {
@@ -326,6 +327,13 @@ public class SeekerUI extends JFrame {
 		lblRestUpload.setBounds(194, -1, 42, 46);
 		panel.add(lblRestUpload);
 		
+		JLabel lblLoading = new JLabel("");
+		lblLoading.setVisible(false);
+		lblLoading.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLoading.setIcon(new ImageIcon("/media/schathuranga/My Stuff/GenesisLab/Freelancing/FBMiner/resources/spinner.gif"));
+		lblLoading.setBounds(88, 13, 60, 40);
+		contentPane.add(lblLoading);
+		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBackground(Color.DARK_GRAY);
 		panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
@@ -350,6 +358,8 @@ public class SeekerUI extends JFrame {
 		btnFetch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//write validation here
+				lblLoading.setVisible(true);
+				
 				int count=0;
 				int dbCount = dbops.validateNumberOfRecords(connection);
 				if(txtIDsToFetch.getText().equals(""))
@@ -393,21 +403,97 @@ public class SeekerUI extends JFrame {
 								TimeUnit.SECONDS.sleep(20);
 							}
 							JOptionPane.showMessageDialog(null, "Fetching Completed", "Success", JOptionPane.INFORMATION_MESSAGE);
+							TimeUnit.SECONDS.sleep(3);
+							lblLoading.setVisible(false);
 						}
 
 					}
 					catch(Exception parsing)
 					{
-						//JOptionPane.showMessageDialog(null, "Parsing input value failed", "Error", JOptionPane.ERROR_MESSAGE);
-						//System.out.println("Parsing input value failed");
 						parsing.printStackTrace();
 					}
 					//JOptionPane.showMessageDialog(null, count + " Facebook user datas Fetched", "Operation Successful!", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 		});
+		
+		JButton btnFetchAll = new JButton("Fetch All");
+		btnFetchAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//fetch till db has no ids
+				int count=0;
+				int dbCount = dbops.validateNumberOfRecords(connection);
+				int inputCount = Integer.parseInt(txtIDsToFetch.getText());
+				boolean condition = (dbCount!=0 && dbCount >= inputCount);
+				
+				while(condition)
+				{						
+					if(txtIDsToFetch.getText().equals(""))
+					{
+						System.out.println("Enter number of IDs to fetch please!");
+						JOptionPane.showMessageDialog(null, "Enter number of IDs to fetch please!", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					else
+					{
+						try
+						{
+							//int inputCount = Integer.parseInt(txtIDsToFetch.getText());
+							if(inputCount > dbCount)
+							{
+								JOptionPane.showMessageDialog(null, "There are no that amount of IDs to be fetched! Fetching completed at the given sequence!", "Error", JOptionPane.ERROR_MESSAGE);
+								System.out.println("There are no that amount of IDs to be fetched!");
+								break;
+								//JOptionPane.showMessageDialog(null, "Fetching Completed", "Success", JOptionPane.INFORMATION_MESSAGE);
+							}
+							else
+							{
+								//start fetching from here onwards
+								String accountUsername = dbops.getAccountUserName(connection);
+								String accountPassword = dbops.getAccountPassword(connection);
+								String amount = (txtIDsToFetch.getText());
+								ResultSet fbIDList = dbops.fetchIDs(connection, amount);
+								String lastID="";
+								while (fbIDList.next())
+								{
+									String fbID = fbIDList.getString(1);	
+									FetchAtOnce fetch = new FetchAtOnce(fbID, accountUsername, accountPassword);
+									fetch.start();	
+									count++;
+									if(count==Integer.parseInt(amount))
+									{
+										lastID=fbID;
+									}
+								}
+								
+								TimeUnit.SECONDS.sleep(20);
+								while(dbops.checkIDAvailability(connection, lastID))
+								{
+									TimeUnit.SECONDS.sleep(20);
+								}
+								//JOptionPane.showMessageDialog(null, "Fetching Completed", "Success", JOptionPane.INFORMATION_MESSAGE);
+								TimeUnit.SECONDS.sleep(3);
+								lblLoading.setVisible(false);
+							}
+	
+						}
+						catch(Exception parsing)
+						{
+							parsing.printStackTrace();
+						}
+						//JOptionPane.showMessageDialog(null, count + " Facebook user datas Fetched", "Operation Successful!", JOptionPane.INFORMATION_MESSAGE);
+					}
+					dbCount = dbops.validateNumberOfRecords(connection);
+					condition = (dbCount!=0 && dbCount >= inputCount);
+				}
+				JOptionPane.showMessageDialog(null, "Fetching Completed", "Success", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		btnFetchAll.setFont(new Font("Ubuntu", Font.PLAIN, 12));
+		btnFetchAll.setBorder(new EmptyBorder(0, 0, 0, 0));
+		btnFetchAll.setBounds(28, 98, 99, 23);
+		panel_1.add(btnFetchAll);
 		btnFetch.setFont(new Font("Ubuntu", Font.PLAIN, 12));
-		btnFetch.setBounds(125, 107, 99, 23);
+		btnFetch.setBounds(129, 98, 99, 23);
 		btnFetch.setBorder(new EmptyBorder(0, 0, 0, 0));
 		panel_1.add(btnFetch);
 		
@@ -441,6 +527,7 @@ public class SeekerUI extends JFrame {
 					CoreBase executeTest = new CoreBase();
 					try 
 					{
+						lblLoading.setVisible(true);
 						String facebookUsername = dbops.getAccountUserName(connection);
 						String facebookPassword = dbops.getAccountPassword(connection);
 						User entity = executeTest.Facebook_Login(txtFBID.getText(), facebookUsername, facebookPassword, connection);
@@ -453,6 +540,7 @@ public class SeekerUI extends JFrame {
 					{
 						e.printStackTrace();
 					}
+					lblLoading.setVisible(false);
 				}
 			}
 		});

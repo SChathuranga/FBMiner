@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JOptionPane;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -30,7 +32,7 @@ public class CoreBase {
 		options.addArguments("--no-sandbox");
 		options.addArguments("--disable-notifications");
 		options.addArguments("headless");
-		System.setProperty("webdriver.chrome.driver", "C:/GoogleChromeDriver/chromedriver.exe"); // "E:/GenesisLab/GoogleChromeDriver/chromedriver.exe" "C:/chromedriver.exe"
+		System.setProperty("webdriver.chrome.driver", "/home/schathuranga/Softwares/GoogleChromeDriver/Linux/chromedriver"); // "E:/GenesisLab/GoogleChromeDriver/chromedriver.exe" "C:/chromedriver.exe"
 		///media/schathuranga/My Stuff/GenesisLab/GoogleChromeDriver
 		// GoogleChrome Driver
 		///home/schathuranga/Softwares/GoogleChromeDriver/Linux/chromedriver
@@ -74,6 +76,7 @@ public class CoreBase {
 		catch(Exception exx)
 		{
 			System.out.println("Invalid Facebook ID or Connection problem!");
+			//JOptionPane.showMessageDialog(null, "Invalid Facebook ID or Connection Expired!", "Fetching Failed", JOptionPane.ERROR_MESSAGE);
 			//setting NA for fields
 			fbUser.setName("NA");
 			fbUser.setAbout("NA");
@@ -287,7 +290,6 @@ public class CoreBase {
 				fbUser.setFriends(fbUser.getFriends() + friendlist + " | FaceBook ID: " + fbID + " || ");
 				System.out.println("\nFriend: " + friendlist);
 				System.out.println("\n Link: " + friend.getAttribute("href")); 
-				
 			}
 		}
 		catch(Exception e)
