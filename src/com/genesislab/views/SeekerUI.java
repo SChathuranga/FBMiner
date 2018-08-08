@@ -443,7 +443,7 @@ public class SeekerUI extends JFrame {
 					String amount = (txtIDsToFetch.getText());
 					String lastID="";
 					//starts here
-					while(dbCount!=0 && dbCount>inputCount)
+					while(dbCount!=0 && dbCount>=inputCount)
 					{
 						try
 						{
@@ -470,6 +470,7 @@ public class SeekerUI extends JFrame {
 							TimeUnit.SECONDS.sleep(3);
 							lblLoading.setVisible(false);
 							dbCount = dbops.validateNumberOfRecords(connection);
+							count=0;
 						}
 						catch(Exception exx)
 						{
